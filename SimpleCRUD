@@ -1,0 +1,55 @@
+pragma solidity ^0.8.0;
+
+contract SimpleCRUD {
+    struct Item {
+        uint id;
+        string name;
+        string value;
+    }
+
+    uint public itemCount = 0;
+    mapping(uint => Item) public items; // Map item IDs to items
+
+    // Event declarations
+    event ItemCreated(uint id, string name, string value);
+    event ItemRead(uint id, string name, string value);
+    event ItemUpdated(uint id, string name, string value);
+    event ItemDeleted(uint id);
+    
+    // Function to CREATE an item
+    function createItem(string memory _name, string memory _value) public {
+        itemCount++;
+        items[itemCount] = Item({
+            id: itemCount,
+            name: _name,
+            value: _value
+        });
+        emit ItemCreated(itemCount, _name, _value);
+    }
+
+    // Function to READ an item
+    function readItem(uint _id) public view returns (uint, string memory, string memory) {
+        Item memory item = items[_id];
+        emit ItemRead(item.id, item.name, item.value);
+        return (item.id, item.name, item.value);
+    }
+
+    // Function to UPDATE an item
+    function updateItem(uint _id, string memory _name, string memory _value) public {
+        require(_id <= itemCount, "Item does not exist");
+        items[_id] = Item({
+            id: _id,
+            name: _name,
+            value: _value
+        });
+        emit ItemUpdated(_id, _name, _value);
+    }
+
+    // Function to DELETE an item
+    function deleteItem(uint _id) public {
+        require(_id <= itemCount, "Item does not exist");
+        itemCount--;
+        delete items[_id]; // Delete the item from the mapping
+        emit ItemDeleted(_id);
+    }
+}
